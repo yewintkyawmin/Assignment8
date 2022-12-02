@@ -1,0 +1,280 @@
+#include<iostream>
+using namespace std;
+
+class Bank
+{
+	private:
+		int currentID=0;
+  		int currentUserAmount=0;
+		int locate = 0;
+		string username[100];
+    	string upassword[100];
+    	int amount[100];
+    	int login_flag = 0;
+		
+	public:
+		void MainMenu();
+		void Register();
+		void Login();
+		void All_info();
+		int toCheckUserName(string TestName);
+		void Exchange();
+		void Transfer();
+		void Withdraw();
+		void AddAmount();
+};
+
+void Bank::MainMenu()
+{
+	int choice;
+	do{
+		cout<<"\n\t\t\t This is Main Menu\n";
+		cout<<"\nPress 1 to Register"<<endl;
+        cout<<"Press 2 to Login"<<endl;
+        cout<<"Press 3 to Exchange"<<endl;
+        cout<<"Press 5 to Quit"<<endl;
+        
+        cout<<"Enter:";cin>>choice;
+        
+        switch(choice)
+        {
+        	case 1 : Register();break;
+        	case 2 : Login();break;
+        	case 3 : if(login_flag ==0)
+					{
+						cout<<"\nYou haven't Log in!!!Please log in first.\n";break;
+					}
+					else
+					{
+						Exchange();break;
+					}
+        	default: cout<<"Thank you,bye";
+					 exit(0);
+		}
+	}while(true);
+}
+
+void Bank::Register()
+{
+	string name,password,password2;
+	int money;
+	int flag;
+	
+	cout<<"\nThis is from registration"<<endl;
+	
+	do{
+		flag = 0;
+		cout<<"\nEnter your name to register:";
+   		cin>>name;
+   		
+   		for(int i=0;i<locate;i++)
+   		{
+		   	if(name == username[i])
+		   	{
+			   	cout<<"\nName already existed!Try Again";
+			   	flag = 1;
+			   	break;
+		    }
+		}	
+   	}while(flag == 1);
+    
+    cout<<"Enter your password to register:";
+    cin>>password;
+    
+ 	do{
+ 		cout<<"\nConfirm password to register:";
+    	cin>>password2;
+    	
+		if(password != password2)
+		{ cout<<"\nWrong Confirm Password,Try again!!";	}
+				
+	}while(password != password2);
+	
+	cout<<"Enter amount:";
+    cin>>money;
+    
+	username[locate] = name ;
+    upassword[locate] = password;
+    amount[locate] = money;
+
+	cout<<"Registration Success!"<<endl;
+    locate++;
+    All_info();
+
+}
+
+void Bank::Login()
+{
+	int flag = 0;
+	string lusername;
+    string lpassword;
+    
+	cout<<"\nThis is from Login"<<endl;
+	login_flag = 1;
+	
+	do
+	{
+		cout<<"\nEnter username to login:";
+	    cin>>lusername;
+	    for(int i=0; i<=locate ; i++)
+	    {
+	    	if(lusername == username[i])
+	    	{ 	flag = 1;	}
+		}
+		if(flag==0)
+		{
+			cout<<"\nUser name doesn't exist,Try Again";
+		}
+	}while(flag==0);
+    
+    flag = 0;
+    
+    do
+	{
+		cout<<"\nEnter password to login for "<<lusername<<" :";
+    	cin>>lpassword;
+    	
+    	int i = toCheckUserName(lusername);
+    	if(i!=1111)
+    	{
+    		if(lpassword == upassword[i])
+	    	{ 	
+				flag = 1;	
+				currentID = i;
+          		currentUserAmount = amount[i];
+
+	    		cout<<"\nLogin Success"<<endl;
+			}
+			if(flag==0)
+			{
+				cout<<"\nWrong Password for "<<lusername<<",Try Again!!";
+			}
+		}
+    }while(flag==0);
+}
+
+
+void Bank::All_info()
+{
+    cout<<"Username"<<endl;
+    for(int i=0; i<=locate ; i++){
+        cout<<"   "<<username[i]<<endl;
+    }
+
+    cout<<"Password"<<endl;
+    for(int i=0; i<=locate ; i++){
+        cout<<"   "<<upassword[i]<<endl;
+    }
+    
+    cout<<"Amount"<<endl;
+    for(int i=0; i<locate ; i++){
+        cout<<"   "<<amount[i]<<endl;
+    }
+}
+
+int Bank::toCheckUserName(string TestName)
+{
+    for(int i =0 ; i<=locate ; i++)
+	{
+        if(TestName == username[i])
+		{    return i;   }
+    }
+    return 1111;
+}
+
+void Bank::Exchange()
+{
+    int exchangeOption=0;
+    
+    do{
+	
+	    cout<<"Press 1 to Transfer:"<<endl;
+	    cout<<"Press 2 to Withdraw:"<<endl;
+	    cout<<"Press 3 to Update Amount:"<<endl;
+	    cout<<"Press 4 to Quit:"<<endl;
+	    cin>>exchangeOption;
+	    
+	    switch(exchangeOption)
+	    {
+	    	case 1 : Transfer();break;
+	    	case 2 : Withdraw();break;
+	    	case 3 : AddAmount();break;
+	    	case 4 : cout<<"\nYou have Exited from exchange option";
+					 break;
+		}
+	}while(exchangeOption!=4);
+	
+}
+
+void Bank::Transfer()
+{
+	string toTransferName;
+    int toTransferAmount;
+    int receiverID ;
+    //Check Name
+	do{
+		cout<<"\nEnter name you want to transfer:";
+   		cin>>toTransferName;
+   		receiverID = toCheckUserName(toTransferName);
+   		
+   		cout<<"receiverID:"<<receiverID;
+   		if(receiverID < 0 || receiverID==1111)
+   		{ cout<<"\nName doesn't exist in Our Database,Try Again"; }
+   		
+	}while(receiverID < 0 || receiverID==1111);
+	
+	//Check Transfer Amount
+	do{
+		cout<<"\nEnter amount to Transfer:";
+    	cin>>toTransferAmount;
+    	cout<<"currentUserAmount:"<<currentUserAmount;
+    	
+    	if(toTransferAmount>=currentUserAmount)
+		{	 
+			cout<<"Invalid amount:"<<endl;
+		}
+		else
+		{
+			amount[currentID]=amount[currentID]-toTransferAmount;
+    		amount[receiverID]=amount[receiverID] + toTransferAmount;
+    		cout<<"Money Successfully Transferred to : "<<username[receiverID]<<endl;
+    		cout<<"Transferred Amount: "<<toTransferAmount<<endl;
+    		All_info();
+		}
+	}while(toTransferAmount>=currentUserAmount);
+}
+
+void Bank::Withdraw()
+{
+	int withdrawamount;
+    cout<<"Enter amount to Withdraw:";
+    cin>>withdrawamount;
+    
+    if(withdrawamount > amount[currentID] )
+    {
+    	cout<<"You haven't enough money to withdraw";
+	}
+	else
+	{
+		amount[currentID] = amount[currentID] - withdrawamount;
+		cout<<username[currentID]<<" : amount = "<<amount[currentID]<<endl;	
+	}
+}
+
+void Bank::AddAmount()
+{
+	int AddAmount;
+	cout<<"Enter amount to Add for"<<username[currentID]<<" :";
+    cin>>AddAmount;
+    amount[currentID] = amount[currentID] + AddAmount;
+    cout<<username[currentID]<<" : amount = "<<amount[currentID]<<endl;	
+    
+}
+
+int main()
+{
+	Bank bank_obj;
+	bank_obj.MainMenu();
+	
+	return 0;
+}
